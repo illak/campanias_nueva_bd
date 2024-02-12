@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.549">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Illak Zapata">
+
+<title>Propuesta de adaptación BD masiva a desarrollo actual del módulo de campañas</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "Sin resultados",
+    "search-matching-documents-text": "documentos encontrados",
+    "search-copy-link-title": "Copiar el enlace en la búsqueda",
+    "search-hide-matches-text": "Ocultar resultados adicionales",
+    "search-more-match-text": "resultado adicional en este documento",
+    "search-more-matches-text": "resultados adicionales en este documento",
+    "search-clear-button-title": "Borrar",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancelar",
+    "search-submit-button-title": "Enviar",
+    "search-label": "Buscar"
+  }
+}</script>
+<script src="site_libs/quarto-diagram/mermaid.min.js"></script>
+<script src="site_libs/quarto-diagram/mermaid-init.js"></script>
+<link href="site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
+
+
+</head>
+
+<body>
+
+<div id="quarto-search-results"></div>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">En esta página</h2>
+   
+  <ul>
+  <li><a href="#etl" id="toc-etl" class="nav-link active" data-scroll-target="#etl">ETL</a></li>
+  <li><a href="#conjuntos-de-destinatarios" id="toc-conjuntos-de-destinatarios" class="nav-link" data-scroll-target="#conjuntos-de-destinatarios">Conjuntos de destinatarios</a></li>
+  <li><a href="#destinatarios-para-campañas-masivas" id="toc-destinatarios-para-campañas-masivas" class="nav-link" data-scroll-target="#destinatarios-para-campañas-masivas">Destinatarios para campañas masivas</a>
+  <ul class="collapse">
+  <li><a href="#grupo-1" id="toc-grupo-1" class="nav-link" data-scroll-target="#grupo-1">Grupo 1</a></li>
+  <li><a href="#grupo-2" id="toc-grupo-2" class="nav-link" data-scroll-target="#grupo-2">Grupo 2</a></li>
+  <li><a href="#unificación-de-grupos" id="toc-unificación-de-grupos" class="nav-link" data-scroll-target="#unificación-de-grupos">Unificación de grupos</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Propuesta de adaptación BD masiva a desarrollo actual del módulo de campañas</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Autor/a</div>
+    <div class="quarto-title-meta-contents">
+             <p>Illak Zapata </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="etl" class="level2">
+<h2 class="anchored" data-anchor-id="etl">ETL</h2>
+<p>Para la generación de la BD de mails masiva se llevó a cabo una tarea de ETL (Extracción, transformación, carga) de datos.</p>
+<ul>
+<li><strong>Extracción</strong> de datos de mails (y otros atributos) de las distintas fuentes existentes y presentadas.</li>
+<li><strong>Transformación</strong> de los datos que implica la limpieza y procesamiento de los mismos, por ejemplo normalización de atributos, verificación de mail, etc.</li>
+<li><strong>Carga</strong> de los datos transformados y unificados en una tabla (con esquema desnormalizado), en donde los mails son un índice único.</li>
+</ul>
+<p>DIAGRAMAS</p>
+<p>AUTOMATIZACIÓN CÓMO TAREA FALTANTE</p>
+</section>
+<section id="conjuntos-de-destinatarios" class="level2">
+<h2 class="anchored" data-anchor-id="conjuntos-de-destinatarios">Conjuntos de destinatarios</h2>
+<p>De acuerdo a los requerimientos que nos pasaron en su momento, debemos considerar los siguientes conjuntos de destinatarios:</p>
+<ul>
+<li>Inspectores generales y supervisores de nivel Inicial</li>
+<li>Directores de escuelas de niveles Inicial</li>
+<li>Inspectores generales y supervisores de nivel Primario</li>
+<li>Directores de escuelas de niveles Primario</li>
+<li>Inspectores generales y supervisores de nivel Secundario</li>
+<li>Directores de escuelas de niveles Secundario</li>
+<li>Inspectores generales y supervisores de nivel Superior</li>
+<li>IFD públicos de toda la provincia (se pueden segregar por departamento, ciudad y carreras que dictan)</li>
+<li>IFD privados de toda la provincia (se pueden segregar por departamento, ciudad y carreras que dictan)</li>
+<li>Base de inglés: todas las personas que tengan cargado que dan inglés en nuestra base de datos; todos los profes que dan inglés en Jornada Extendida (base externa); toda la gente de la comunidad de prácticas que de inglés; toda la gente que se cursó los Ateneos de inglés; todas las personas que se anotaron a conversatorios de inglés; todas las bases de datos que tengan el programa Entre Lenguas.</li>
+<li>Base masiva: armar una nueva que traiga: personas (autogestión), inscriptos a eventos (no repetidos en Personas); personas que se suscriben en el portal y HE; bases de datos externas (supervisores, directores de escuelas).</li>
+<li>Base HE, separada por niveles. Todos los que se suscribieron de acuerdo al nivel que hayan indicado; todas las personas de la base ISEP de la que podemos rastrear el nivel de desempeño.</li>
+</ul>
+<p>Por orden de prioridad y necesidad, arrancaremos por el grupo destinatario más grande: <strong>destinatarios para campañas masivas</strong>.</p>
+</section>
+<section id="destinatarios-para-campañas-masivas" class="level2">
+<h2 class="anchored" data-anchor-id="destinatarios-para-campañas-masivas">Destinatarios para campañas masivas</h2>
+<p>De acuerdo a lo anterior, se pide que el listado de destinatarios esté conformado por:</p>
+<blockquote class="blockquote">
+<p>personas (autogestión), inscriptos a eventos (no repetidos en Personas); personas que se suscriben en el portal y HE; bases de datos externas (supervisores, directores de escuelas).</p>
+</blockquote>
+<p>Pero antes repasemos la consulta que actualmente está siendo utilizada para este tipo de campañas:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> `dni`, `nombre`, `apellido`, `emails` <span class="kw">as</span> `email1`, </span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="st">''</span> <span class="kw">as</span> email2, `email_gapp`, `personas`.`idpersona` <span class="kw">as</span> `p_idpersona`, </span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="dv">0</span> <span class="kw">as</span> `c_idmatriculacion`</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> `personas`</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> `emails` <span class="kw">NOT</span> <span class="kw">IN</span> (<span class="kw">select</span> email1 <span class="kw">from</span> mailing_altasbajas <span class="kw">where</span> tipo<span class="op">=</span><span class="ot">"baja"</span>)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="kw">AND</span> `email_gapp` <span class="kw">NOT</span> <span class="kw">IN</span> (<span class="kw">select</span> email1 <span class="kw">from</span> mailing_altasbajas <span class="kw">where</span> tipo<span class="op">=</span><span class="ot">"baja"</span>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="kw">AND</span> personas.idpersona <span class="kw">NOT</span> <span class="kw">IN</span> (<span class="kw">SELECT</span> `idpersona`</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> `mailing_destinatarios`</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> `idcampania` <span class="op">=</span> <span class="st">'1956'</span>) </span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="kw">union</span> </span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="st">''</span> <span class="kw">as</span> dni, `nombre` <span class="kw">as</span> `nombre`, `apellido` <span class="kw">as</span> `apellido`, </span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>`email1` <span class="kw">as</span> `email1`, `email2` <span class="kw">as</span> `email2`, <span class="st">''</span> <span class="kw">as</span> email_gapp, </span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="dv">0</span> <span class="kw">as</span> `p_idpersona`, <span class="dv">0</span> <span class="kw">as</span> `c_idmatriculacion`</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> `mailing_altasbajas`</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> `tipo` <span class="op">=</span> <span class="st">'alta'</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="kw">AND</span> `categoria` <span class="op">=</span> <span class="st">'Suscripción voluntaria'</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="kw">AND</span> `email1` <span class="kw">NOT</span> <span class="kw">IN</span> (<span class="kw">select</span> email1 <span class="kw">from</span> mailing_altasbajas <span class="kw">where</span> tipo<span class="op">=</span><span class="ot">"baja"</span>)</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Nota
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Como se puede observar, esta consulta únicamente considera el grupo de personas de autogestión y suscripciones voluntarias, haciendo que el “alcance” o “llegada” sea menor a lo que se propone en este tipo de campañas “masivas”. Por otro lado como se analizó en su momento, únicamente (y mayoritariamente) se está llegando a docentes que ya han interactuado con al menos una propuesta en el ISEP.</p>
+</div>
+</div>
+<p>A continuación se indica la disponibilidad de cada una de las columnas en la nueva BD de mails:</p>
+<ul>
+<li><code>dni</code> (sólo si se tiene el dato de la fuente de origen, por ejemplo, las cuentas que se obtienen de autogestión sí cuentan con este campo)</li>
+<li><code>nombre</code> (casi siempre, ídem <code>dni</code>)</li>
+<li><code>apellido</code> (casi siempre, ídem <code>dni</code>)</li>
+<li><code>email1</code> (se hace la suposición de que este campo es el “mail personal”, siempre va a estar disponible)</li>
+<li><code>email2</code> (al parecer este campo no se utiliza)</li>
+<li><code>email_gapp</code> (el correo institucional, sólo para personas que han interactuado con alguna propuesta del ISEP)</li>
+<li><code>p_idpersona</code> (ídem <code>email_gapp</code>, este campo actualmente no existe en la BD de mails, se puede considerar sumar este atributo… <em>¿se utiliza?</em>)</li>
+<li><code>c_idmatriculacion</code> (al parecer este campo no se utiliza)</li>
+</ul>
+<p>En base a lo anterior debemos analizar también qué campos se pueden “quitar” en la nueva consulta y cuales permanecen. Para esto debemos evaluar si el módulo “exige” la existencia de ciertos atributos o no:</p>
+<ul>
+<li>¿Cuáles son obligatorios?</li>
+<li>¿De cuáles podemos prescindir?</li>
+<li>¿Las campañas masivas hacen uso de todos esos atributos? ¿Se usa el nombre? ¿Se usa el apellido?</li>
+</ul>
+<p>A veces este tipo de preguntas sumadas a la propuesta de un esquema nuevo de BD, nos llevan a evaluar la necesidad de agregar nueva lógica o bien, modificar la actual, cómo por ejemplo para el caso del atributo nombre:</p>
+<div class="cell" data-layout-align="center">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">flowchart LR
+  C{"¿Tengo el dato del nombre?"}
+  C-- Sí --&gt;D["Estimado {nombre}, ..."]
+  C-- No --&gt;E["Estimado docente, ..."]
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<p>Esto al momento de “renderizar” la plantilla o cuerpo del mail con los datos correspondientes. Pero obviamente esto queda sujeto a debate.</p>
+<p>Volviendo al caso, la fuente de mails masiva tiene la particularidad de que podemos agrupar cuentas por DNI pero, como se indicó anteriormente, este atributo no figura en <strong>todas</strong> las fuentes originales. Debido a esto se proponen dos grupos que luego serán unificadas.</p>
+<ul>
+<li>Con el dato DNI: se agrupan las cuentas en base a este atributo para identificar aquellas que pertenecen a una misma persona. Este grupo contempla (o contiene) las cuentas de personas que han pasado por el ISEP, es decir, contiene en su mayoría al conjunto de cuentas que estaba siendo utilizado en las campañas masivas hacia finales del 2023. Pero también pueden ser cuentas de personas que no interactuaron con el ISEP y por lo tanto no tienen el dato de cuenta institucional, pero sí el personal.</li>
+<li>Sin el dato DNI: lo que se considera como “el resto”. Cuentas de otras fuentes que no contengan el dato de DNI y que, por lo tanto, no podemos identificar la persona a la que pertenece y de esta forma agruparlos.</li>
+</ul>
+<p>Recordemos que ya que la <em>fuente de mails</em> tiene como base la característica de <em>unicidad</em> en las cuentas de correo, sabemos que en los grupos que se generen <strong>no va a haber cuentas repetidas</strong> (tanto al interior como entre grupos). Ojo!! que esto no nos asegura que un mail que exista en el segundo grupo no pertenezca a una persona del primero pero al <strong>no tener el dato de DNI</strong>, no lo podremos saber.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Nota
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>El autor considera que no tiene sentido armar una <strong>heurística</strong> avanzada que permita unificar mails en base a otros atríbutos ya que es un trabajo que lleva su tiempo y esto sólo justifica un esquema en que los registros son <strong>personas únicas</strong>.</p>
+<p>Para el autor, cada registro en la BD masiva es una <strong>cuenta de correo única</strong> con los atributos que hacen de metadato para conocer un poco más sobre el origen de la cuenta. De esta forma, se puede decidir cómo proceder en agrupar o generar “bolsas” de cuentas a las cuales enviar campañas.</p>
+<p>Es una de las tantas formas de abstraer el problema.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Importante
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>El desarrollo de la fuente de mails masiva, contempla la idea GIGO (garbage IN, garbage OUT), “<em>basura entra, basura sale</em>”. En ese sentido si la fuente de origen tiene errores o inconsistencias, las mismas se verán reflejadas en las fuentes resultantes (o analíticas). Esto viene al caso por un error que se detectó hace poco sobre dos persona (de la tabla <code>personas</code>, fuente de origen) que compartían el mismo DNI. Esto se vió reflejado en la BD de mails ya que no permite identificar a qué persona corresponde la cuenta y por lo tanto el proceso de unificar resuelve de manera errónea para estas dos cuentas.</p>
+<p>El desarrollo de este tipo de fuentes o <em>data warehouses</em>, generalmente considera que las fuentes de origen son lo suficientemente robustas, consistentes y entonces sólo se enfoca el trabajo en normalizar o limpiar datos, pero no en corregirlos.</p>
+</div>
+</div>
+<section id="grupo-1" class="level3">
+<h3 class="anchored" data-anchor-id="grupo-1">Grupo 1</h3>
+<p>Tomando cómo referencia las columnas de la consulta actual para destinatarios de campañas masivas:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- REGISTROS QUE CUENTAN CON EL DATO DE DNI</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> mas.dni,</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    mas.nombre, mas.apellido,</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">max</span>(<span class="cf">if</span>(mas.cuenta_institucional<span class="op">=</span><span class="dv">1</span>,mas.email,<span class="kw">NULL</span>)) <span class="kw">as</span> email_gapp,</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">max</span>(<span class="cf">if</span>(mas.cuenta_institucional<span class="op">=</span><span class="dv">0</span>,mas.email,<span class="kw">NULL</span>)) <span class="kw">as</span> email1,</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">''</span> <span class="kw">as</span> email2, <span class="kw">NULL</span> <span class="kw">as</span> p_idpersona, <span class="kw">NULL</span> <span class="kw">as</span> c_idmatriculacion</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> campanias_cuentas_masiva <span class="kw">as</span> mas</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> mas.dni <span class="kw">IS</span> <span class="kw">NOT</span> <span class="kw">NULL</span> <span class="kw">and</span> mas.suscripcion<span class="op">=</span><span class="ot">"si"</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> mas.dni;</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>hemos conservado los mismos campos pero con algunas consideraciones:</p>
+<ul>
+<li><code>p_idpersona</code> ahora es <code>NULL</code></li>
+<li><code>c_idmatriculacion</code> ahora es <code>NULL</code></li>
+</ul>
+<p>Por otro lado, como se puede notar en los primeros registros que devuelve la consulta:</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="imgs/grupo_1_email_gapp.png" class="img-fluid figure-img"></p>
+<figcaption>primeros registros de la consulta para el grupo 1</figcaption>
+</figure>
+</div>
+<p>algunos DNI tienen un formato incorrecto: algunos con pocos dígitos, en otros todos los dígitos son cero, otros empiezan por cero, etc. Esto es consecuencia de la idea <em>GIGO</em> (basura entra, basura sale). Las fuentes de origen tienen el dato de DNI mal formateado, sin verificación, etc. Sin embargo el mail asociado (el personal) es correcto (al menos estructuralmente o en términos de sintaxis). A raíz de esto se recomienda revisar las reglas de verificación en las distintas fuentes que admiten el dato de DNI a partir de <strong>formularios</strong>. Por otro lado se puede revisar el <strong>tipo de dato</strong> en las tablas de la BD.</p>
+<p>Se proponen 2 opciones:</p>
+<ol type="1">
+<li>Se deja tal como está: sabemos que la cuenta está bien y el campo DNI no es relevante en el envío de campañas, sólo es útil para <strong>agrupar</strong> cuentas asociadas a una misma persona. Esto se corrige automáticamente, al corregir la fuente de origen (GIGO).</li>
+<li>Se hace un filtro posterior, dejando únicamente los registros con el campo DNI “correcto”. Esto va acorde a la “cultura” del parche constante.</li>
+</ol>
+<p>En este caso se procede con la opción número 1.</p>
+</section>
+<section id="grupo-2" class="level3">
+<h3 class="anchored" data-anchor-id="grupo-2">Grupo 2</h3>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- REGISTROS QUE NO CUENTAN CON EL DATO DE DNI</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> mas.dni,</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    mas.nombre, mas.apellido,</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span>(mas.cuenta_institucional<span class="op">=</span><span class="dv">1</span>,mas.email,<span class="kw">NULL</span>) <span class="kw">as</span> email_gapp,</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span>(mas.cuenta_institucional<span class="op">=</span><span class="dv">0</span>,mas.email,<span class="kw">NULL</span>) <span class="kw">as</span> email1,</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">''</span> <span class="kw">as</span> email2, <span class="kw">NULL</span> <span class="kw">as</span> p_idpersona, <span class="kw">NULL</span> <span class="kw">as</span> c_idmatriculacion</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> campanias_cuentas_masiva <span class="kw">as</span> mas</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> mas.dni <span class="kw">IS</span> <span class="kw">NULL</span> <span class="kw">and</span> mas.suscripcion<span class="op">=</span><span class="ot">"si"</span>;</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Este grupo contiene muchos menos registros que el primero. Algunas observaciones sobre este grupo:</p>
+<ul>
+<li>Ningún registro tiene el dato de <code>email_gapp</code> (o cuenta institucional).</li>
+<li>Se puede observar que varios registros no tienen el dato de <em>Nombre</em> y/o <em>Apellido</em></li>
+</ul>
+</section>
+<section id="unificación-de-grupos" class="level3">
+<h3 class="anchored" data-anchor-id="unificación-de-grupos">Unificación de grupos</h3>
+<p>Finalmente se procede con la unión de ambos grupos para la consulta definitiva:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- GRUPO 1</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> mas.dni,</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    mas.nombre, mas.apellido,</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">max</span>(<span class="cf">if</span>(mas.cuenta_institucional<span class="op">=</span><span class="dv">1</span>,mas.email,<span class="kw">NULL</span>)) <span class="kw">as</span> email_gapp,</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">max</span>(<span class="cf">if</span>(mas.cuenta_institucional<span class="op">=</span><span class="dv">0</span>,mas.email,<span class="kw">NULL</span>)) <span class="kw">as</span> email1,</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">''</span> <span class="kw">as</span> email2, <span class="kw">NULL</span> <span class="kw">as</span> p_idpersona, <span class="kw">NULL</span> <span class="kw">as</span> c_idmatriculacion</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> campanias_cuentas_masiva <span class="kw">as</span> mas</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> mas.dni <span class="kw">IS</span> <span class="kw">NOT</span> <span class="kw">NULL</span> <span class="kw">and</span> mas.suscripcion<span class="op">=</span><span class="ot">"si"</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> mas.dni</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="kw">UNION</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="co">--GRUPO 2</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> mas.dni,</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>    mas.nombre, mas.apellido,</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span>(mas.cuenta_institucional<span class="op">=</span><span class="dv">1</span>,mas.email,<span class="kw">NULL</span>) <span class="kw">as</span> email_gapp,</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span>(mas.cuenta_institucional<span class="op">=</span><span class="dv">0</span>,mas.email,<span class="kw">NULL</span>) <span class="kw">as</span> email1,</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>    <span class="st">''</span> <span class="kw">as</span> email2, <span class="kw">NULL</span> <span class="kw">as</span> p_idpersona, <span class="kw">NULL</span> <span class="kw">as</span> c_idmatriculacion</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> campanias_cuentas_masiva <span class="kw">as</span> mas</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> mas.dni <span class="kw">IS</span> <span class="kw">NULL</span> <span class="kw">and</span> mas.suscripcion<span class="op">=</span><span class="ot">"si"</span>;</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copiado");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copiado");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
