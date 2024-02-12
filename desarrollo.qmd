@@ -4,6 +4,10 @@ author: "Illak Zapata"
 format: 
   html:
     toc: true
+    toc-location: left
+    theme: 
+      light: flatly
+      dark: darkly
 editor: source
 lang: es
 ---
@@ -106,7 +110,8 @@ siempre va a estar disponible)
 * `email_gapp` (el correo institucional, sólo para personas que han
 interactuado con alguna propuesta del ISEP)
 * `p_idpersona` (ídem `email_gapp`, este campo actualmente no existe en
-la BD de mails, se puede considerar sumar este atributo... *¿se utiliza?*)
+la BD de mails, se puede considerar sumar este atributo, pero... 
+*¿se utiliza?*)
 * `c_idmatriculacion` (al parecer este campo no se utiliza)
 
 En base a lo anterior debemos analizar también qué campos se pueden "quitar"
@@ -132,7 +137,7 @@ flowchart LR
 ```
 
 
-Esto al momento de "renderizar" la plantilla o cuerpo del mail con los
+Esto, al momento de "renderizar" la plantilla o cuerpo del mail con los
 datos correspondientes. Pero obviamente esto queda sujeto a debate.
 
 Volviendo al caso, la fuente de mails masiva tiene la particularidad de
@@ -261,7 +266,9 @@ Algunas observaciones sobre este grupo:
 
 * Ningún registro tiene el dato de `email_gapp` (o cuenta institucional).
 * Se puede observar que varios registros no tienen el dato de *Nombre* y/o
-*Apellido*
+*Apellido*. Esto se debe a las fuentes de origen que mayormente "alimentan"
+a este grupo (fuentes externas a la de `personas` en donde 
+nombre/apellido/dni no parecen ser datos relevantes).
 
 
 ### Unificación de grupos 
@@ -295,5 +302,81 @@ WHERE mas.dni IS NULL and mas.suscripcion="si";
 
 ```
 
+## Grupos destinatarios específicos
+
+Para todos estos grupos, se aprovechan los distintos atributos de la 
+fuente de mails masiva. Esto se verá reflejado en la parte 
+del `WHERE` en las siguientes consultas.
 
 
+### Inspectores generales y supervisores de nivel Inicial
+
+
+```sql
+
+
+```
+
+### Directores de escuelas de niveles Inicial
+
+
+```sql
+
+
+```
+
+### Inspectores generales y supervisores de nivel Primario
+
+
+```sql
+
+
+```
+
+### Directores de escuelas de niveles Primario
+
+
+```sql
+
+
+```
+
+### Inspectores generales y supervisores de nivel Secundario
+
+
+```sql
+
+
+```
+
+### Directores de escuelas de niveles Secundario
+
+
+```sql
+
+
+```
+
+### Inspectores generales y supervisores de nivel Superior
+
+
+```sql
+
+
+```
+
+### IFD públicos de toda la provincia (se pueden segregar por departamento, ciudad y carreras que dictan)
+
+
+```sql
+
+
+```
+
+### IFD privados de toda la provincia (se pueden segregar por departamento, ciudad y carreras que dictan)
+
+
+```sql
+
+
+```
