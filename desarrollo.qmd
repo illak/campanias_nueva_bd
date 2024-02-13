@@ -613,3 +613,73 @@ SELECT mas.dni,
 FROM campanias_cuentas_masiva as mas
 WHERE mas.fuente like "%ifd%" and  mas.ifd_gest_privada=1;
 ```
+
+### Base de inglés
+
+>Todas las personas que tengan cargado que dan inglés en nuestra base de datos; todos los profes que dan inglés en Jornada Extendida (base externa); toda la gente de la comunidad de prácticas que de inglés; toda la gente que se cursó los Ateneos de inglés; todas las personas que se anotaron a conversatorios de inglés; todas las bases de datos que tengan el programa Entre Lenguas.
+
+Este grupo tiene múltiples condiciones o mejor dicho, está conformado por
+múltiples "sub-grupos".
+
+Para identificar cuentas pertenecientes a personas que **dan inglés** 
+y/o que cursaron alguna propuesta asociada al área de inglés, se sumó 
+el atributo `ingles`.
+Para la construcción de este atributo se consideran:
+
+* Personas que figuran como "activas" en algún cargo/rol
+de docencia en el área inglés
+* Personas que han interactuado con alguna de las propuestas indicadas
+(ateneos, conversatorios).
+
+El resto de "sub-grupos" se extraen de las siguientes fuentes:
+
+* Docentes de Inglés, Jornada Extendida 2022: `ije22`
+* Docentes de Inglés, Jornada Extendida 2023: `ije23`
+* Todas las bases de datos que tengan el programa Entre Lenguas: `el22`, `el23`
+
+Cabe destacar que todas estas fuentes fueron importadas inicialmente a
+partir de un archivo excel compartido por el área de comunicación. 
+En ese sentido, se deben actualizar a demanda y/o sumar según se vayan
+generando nuevas ediciones.
+
+Finalmente, debido a que las cuentas pueden salir de diversas fuentes y
+por lo tanto podemos tener el dato del DNI, se retoma la idea de combinar
+los dos posibles grupos.
+
+Entonces la consulta queda de la siguiente manera:
+
+
+```sql
+
+-- GRUPO 1
+SELECT mas.dni,
+	mas.nombre, mas.apellido,
+	max(if(mas.cuenta_institucional=1,mas.email,NULL)) as email_gapp,
+  	max(if(mas.cuenta_institucional=0,mas.email,NULL)) as email1,
+    '' as email2, NULL as p_idpersona, NULL as c_idmatriculacion
+FROM campanias_cuentas_masiva as mas
+WHERE mas.dni IS NOT NULL and mas.suscripcion="si" AND
+	(mas.fuente like "%ije%" OR mas.fuente like "%el%" OR mas.ingles=1)
+GROUP BY mas.dni
+
+UNION
+
+-- GRUPO 2
+SELECT mas.dni,
+	mas.nombre, mas.apellido,
+	if(mas.cuenta_institucional=1,mas.email,NULL) as email_gapp,
+  	if(mas.cuenta_institucional=0,mas.email,NULL) as email1,
+    '' as email2, NULL as p_idpersona, NULL as c_idmatriculacion
+FROM campanias_cuentas_masiva as mas
+WHERE mas.dni IS NULL and mas.suscripcion="si" AND
+	(mas.fuente like "%ije%" OR mas.fuente like "%el%" OR mas.ingles=1);
+```
+
+
+## Base HE, separada por niveles
+
+>Todos los que se suscribieron de acuerdo al nivel que hayan indicado; todas las personas de la base ISEP de la que podemos rastrear el nivel de desempeño.
+
+
+Esta fuente aún no fue agregada ya que debemos analizar cómo obtener el
+listado de personas que se suscribieron en la plataforma.

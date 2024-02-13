@@ -139,7 +139,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#inspectores-generales-y-supervisores-de-nivel-superior" id="toc-inspectores-generales-y-supervisores-de-nivel-superior" class="nav-link" data-scroll-target="#inspectores-generales-y-supervisores-de-nivel-superior">Inspectores generales y supervisores de nivel Superior</a></li>
   <li><a href="#ifd-públicos-de-toda-la-provincia-se-pueden-segregar-por-departamento-ciudad-y-carreras-que-dictan" id="toc-ifd-públicos-de-toda-la-provincia-se-pueden-segregar-por-departamento-ciudad-y-carreras-que-dictan" class="nav-link" data-scroll-target="#ifd-públicos-de-toda-la-provincia-se-pueden-segregar-por-departamento-ciudad-y-carreras-que-dictan">IFD públicos de toda la provincia (se pueden segregar por departamento, ciudad y carreras que dictan)</a></li>
   <li><a href="#ifd-privados-de-toda-la-provincia-se-pueden-segregar-por-departamento-ciudad-y-carreras-que-dictan" id="toc-ifd-privados-de-toda-la-provincia-se-pueden-segregar-por-departamento-ciudad-y-carreras-que-dictan" class="nav-link" data-scroll-target="#ifd-privados-de-toda-la-provincia-se-pueden-segregar-por-departamento-ciudad-y-carreras-que-dictan">IFD privados de toda la provincia (se pueden segregar por departamento, ciudad y carreras que dictan)</a></li>
+  <li><a href="#base-de-inglés" id="toc-base-de-inglés" class="nav-link" data-scroll-target="#base-de-inglés">Base de inglés</a></li>
   </ul></li>
+  <li><a href="#base-he-separada-por-niveles" id="toc-base-he-separada-por-niveles" class="nav-link" data-scroll-target="#base-he-separada-por-niveles">Base HE, separada por niveles</a></li>
   </ul>
 </nav>
 </nav>
@@ -649,9 +651,60 @@ Nota
 <span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">''</span> <span class="kw">as</span> email2, <span class="kw">NULL</span> <span class="kw">as</span> p_idpersona, <span class="kw">NULL</span> <span class="kw">as</span> c_idmatriculacion</span>
 <span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> campanias_cuentas_masiva <span class="kw">as</span> mas</span>
 <span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> mas.fuente <span class="kw">like</span> <span class="ot">"%ifd%"</span> <span class="kw">and</span>  mas.ifd_gest_privada<span class="op">=</span><span class="dv">1</span>;</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
-
-
 </section>
+<section id="base-de-inglés" class="level3">
+<h3 class="anchored" data-anchor-id="base-de-inglés">Base de inglés</h3>
+<blockquote class="blockquote">
+<p>Todas las personas que tengan cargado que dan inglés en nuestra base de datos; todos los profes que dan inglés en Jornada Extendida (base externa); toda la gente de la comunidad de prácticas que de inglés; toda la gente que se cursó los Ateneos de inglés; todas las personas que se anotaron a conversatorios de inglés; todas las bases de datos que tengan el programa Entre Lenguas.</p>
+</blockquote>
+<p>Este grupo tiene múltiples condiciones o mejor dicho, está conformado por múltiples “sub-grupos”.</p>
+<p>Para identificar cuentas pertenecientes a personas que <strong>dan inglés</strong> y/o que cursaron alguna propuesta asociada al área de inglés, se sumó el atributo <code>ingles</code>. Para la construcción de este atributo se consideran:</p>
+<ul>
+<li>Personas que figuran como “activas” en algún cargo/rol de docencia en el área inglés</li>
+<li>Personas que han interactuado con alguna de las propuestas indicadas (ateneos, conversatorios).</li>
+</ul>
+<p>El resto de “sub-grupos” se extraen de las siguientes fuentes:</p>
+<ul>
+<li>Docentes de Inglés, Jornada Extendida 2022: <code>ije22</code></li>
+<li>Docentes de Inglés, Jornada Extendida 2023: <code>ije23</code></li>
+<li>Todas las bases de datos que tengan el programa Entre Lenguas: <code>el22</code>, <code>el23</code></li>
+</ul>
+<p>Cabe destacar que todas estas fuentes fueron importadas inicialmente a partir de un archivo excel compartido por el área de comunicación. En ese sentido, se deben actualizar a demanda y/o sumar según se vayan generando nuevas ediciones.</p>
+<p>Finalmente, debido a que las cuentas pueden salir de diversas fuentes y por lo tanto podemos tener el dato del DNI, se retoma la idea de combinar los dos posibles grupos.</p>
+<p>Entonces la consulta queda de la siguiente manera:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="co">-- GRUPO 1</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> mas.dni,</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    mas.nombre, mas.apellido,</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">max</span>(<span class="cf">if</span>(mas.cuenta_institucional<span class="op">=</span><span class="dv">1</span>,mas.email,<span class="kw">NULL</span>)) <span class="kw">as</span> email_gapp,</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">max</span>(<span class="cf">if</span>(mas.cuenta_institucional<span class="op">=</span><span class="dv">0</span>,mas.email,<span class="kw">NULL</span>)) <span class="kw">as</span> email1,</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">''</span> <span class="kw">as</span> email2, <span class="kw">NULL</span> <span class="kw">as</span> p_idpersona, <span class="kw">NULL</span> <span class="kw">as</span> c_idmatriculacion</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> campanias_cuentas_masiva <span class="kw">as</span> mas</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> mas.dni <span class="kw">IS</span> <span class="kw">NOT</span> <span class="kw">NULL</span> <span class="kw">and</span> mas.suscripcion<span class="op">=</span><span class="ot">"si"</span> <span class="kw">AND</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>    (mas.fuente <span class="kw">like</span> <span class="ot">"%ije%"</span> <span class="kw">OR</span> mas.fuente <span class="kw">like</span> <span class="ot">"%el%"</span> <span class="kw">OR</span> mas.ingles<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="kw">GROUP</span> <span class="kw">BY</span> mas.dni</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a><span class="kw">UNION</span></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a><span class="co">-- GRUPO 2</span></span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> mas.dni,</span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>    mas.nombre, mas.apellido,</span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span>(mas.cuenta_institucional<span class="op">=</span><span class="dv">1</span>,mas.email,<span class="kw">NULL</span>) <span class="kw">as</span> email_gapp,</span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span>(mas.cuenta_institucional<span class="op">=</span><span class="dv">0</span>,mas.email,<span class="kw">NULL</span>) <span class="kw">as</span> email1,</span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>    <span class="st">''</span> <span class="kw">as</span> email2, <span class="kw">NULL</span> <span class="kw">as</span> p_idpersona, <span class="kw">NULL</span> <span class="kw">as</span> c_idmatriculacion</span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> campanias_cuentas_masiva <span class="kw">as</span> mas</span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> mas.dni <span class="kw">IS</span> <span class="kw">NULL</span> <span class="kw">and</span> mas.suscripcion<span class="op">=</span><span class="ot">"si"</span> <span class="kw">AND</span></span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a>    (mas.fuente <span class="kw">like</span> <span class="ot">"%ije%"</span> <span class="kw">OR</span> mas.fuente <span class="kw">like</span> <span class="ot">"%el%"</span> <span class="kw">OR</span> mas.ingles<span class="op">=</span><span class="dv">1</span>);</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="base-he-separada-por-niveles" class="level2">
+<h2 class="anchored" data-anchor-id="base-he-separada-por-niveles">Base HE, separada por niveles</h2>
+<blockquote class="blockquote">
+<p>Todos los que se suscribieron de acuerdo al nivel que hayan indicado; todas las personas de la base ISEP de la que podemos rastrear el nivel de desempeño.</p>
+</blockquote>
+<p>Esta fuente aún no fue agregada ya que debemos analizar cómo obtener el listado de personas que se suscribieron en la plataforma.</p>
+
+
 </section>
 
 </main> <!-- /main -->
