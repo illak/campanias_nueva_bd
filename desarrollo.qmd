@@ -132,8 +132,8 @@ modificar la actual, cómo por ejemplo para el caso del atributo nombre:
 %%| fig-align: center
 flowchart LR
   C{"¿Tengo el dato del nombre?"}
-  C-- Sí -->D["Estimado {nombre}, ..."]
-  C-- No -->E["Estimado docente, ..."]
+  C-- Sí -->D["Estimado/a {nombre}, ..."]
+  C-- No -->E["Estimado/a docente, ..."]
 ```
 
 
