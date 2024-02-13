@@ -199,7 +199,7 @@ limpiar datos, pero no en corregirlos.
 
 ### Grupo 1
 
-Tomando cómo referencia las columnas de la consulta actual para
+Tomando como referencia las columnas de la consulta actual para
 destinatarios de campañas masivas:
 
 ```sql
@@ -248,6 +248,9 @@ En este caso se procede con la opción número 1.
 
 ### Grupo 2
 
+Similar al *Grupo 1* pero notar que cambia el `WHERE` y ya no se agrupan
+registros.
+
 ```sql
 
 -- REGISTROS QUE NO CUENTAN CON EL DATO DE DNI
@@ -262,7 +265,7 @@ WHERE mas.dni IS NULL and mas.suscripcion="si";
 ```
 
 Este grupo contiene muchos menos registros que el primero. 
-Algunas observaciones sobre este grupo:
+Algunas observaciones:
 
 * Ningún registro tiene el dato de `email_gapp` (o cuenta institucional).
 * Se puede observar que varios registros no tienen el dato de *Nombre* y/o
@@ -273,8 +276,8 @@ nombre/apellido/dni no parecen ser datos relevantes).
 
 ### Unificación de grupos 
 
-Finalmente se procede con la unión de ambos grupos para la consulta 
-definitiva:
+Finalmente se procede con la unión de ambos grupos para construir
+la consulta definitiva de destinatarios de **campañas masivas**:
 
 
 ```sql
@@ -291,7 +294,7 @@ GROUP BY mas.dni
 
 UNION
 
---GRUPO 2
+-- GRUPO 2
 SELECT mas.dni,
 	mas.nombre, mas.apellido,
 	if(mas.cuenta_institucional=1,mas.email,NULL) as email_gapp,
@@ -311,66 +314,290 @@ del `WHERE` en las siguientes consultas.
 
 ### Inspectores generales y supervisores de nivel Inicial
 
+En este caso se filtran:
+
+* cuentas que provienen de la fuente de supervisores `sup`
+* además que sean de nivel inicial `inicial=1`
+
+Similar a la consulta general (de campaña masiva), se hace una división 
+en grupos de registros con existencia del dato de DNI y sin existencia 
+del mismo. 
+Esto para evitar que a una persona le llegue el mismo mail más de una 
+vez (aunque se debería verificar que en términos de envío, da lo mismo
+enviar un mail con `CC` o enviar dos mails distintos o bien, enviar
+un mail con una *"bolsa"* de mails en `CCO`):
+
+::: {.callout-note}
+Por ejemplo, se deberían evaluar las distintas opciones en el envío
+de mails:
+
+Opción 1 (la actual):
+
+suponiendo que `mail1@dom.com` y `mail2@dom.com` pertenecen a la misma
+persona, en un mismo envío:
+
+* TO: `mail1@dom.com`
+* CC: `mail2@dom.com`
+
+Opción 2 (una cuenta, un mail):
+
+Esta es la opción que se ajusta al esquema de la BD de cuentas
+
+* envío 1 -> TO: `mail1@dom.com`
+* envío 2 -> TO: `mail2@dom.com`
+
+Esta opción pareciera ser la menos eficiente, aunque si la opción 1
+por detrás resuelve de esta manera, entonces es lo mismo.
+
+Opción 3 (CCO como "bolsa" de mails):
+
+Esta opción es la que se usa generalmente para campañas de *marketing*
+pero siguiendo determinadas "buenas prácticas" u otros servicios.
+En este caso ya no se tiene un mail por *persona*, la idea es enviar
+un mail a una "*bolsa*" de cuentas.
+
+* TO:
+* CCO: `mail1@dom.com`, `mail2@dom.com`, `mail3@dom.com`, 
+`mail4@dom.com`, . . . 
+
+
+**Todo esto está sujeto a análisis e investigación🔎.**
+
+:::
 
 ```sql
 
+-- GRUPO 1
+SELECT mas.dni,
+	mas.nombre, mas.apellido,
+	max(if(mas.cuenta_institucional=1,mas.email,NULL)) as email_gapp,
+  	max(if(mas.cuenta_institucional=0,mas.email,NULL)) as email1,
+    '' as email2, NULL as p_idpersona, NULL as c_idmatriculacion
+FROM campanias_cuentas_masiva as mas
+WHERE mas.dni IS NOT NULL and mas.suscripcion="si"
+  AND mas.fuente like "%sup%" AND mas.inicial=1
+GROUP BY mas.dni
 
+UNION
+
+-- GRUPO 2
+SELECT mas.dni,
+	mas.nombre, mas.apellido,
+	if(mas.cuenta_institucional=1,mas.email,NULL) as email_gapp,
+  	if(mas.cuenta_institucional=0,mas.email,NULL) as email1,
+    '' as email2, NULL as p_idpersona, NULL as c_idmatriculacion
+FROM campanias_cuentas_masiva as mas
+WHERE mas.dni IS NULL and mas.suscripcion="si" AND
+  mas.fuente like "%sup%" AND mas.inicial=1
 ```
 
 ### Directores de escuelas de niveles Inicial
 
+En este caso se filtran registros que:
+
+* provienen de la fuente `dir`
+* y que sean de nivel inicial `inicial=1`
+
 
 ```sql
 
+-- GRUPO 1
+SELECT mas.dni,
+	mas.nombre, mas.apellido,
+	max(if(mas.cuenta_institucional=1,mas.email,NULL)) as email_gapp,
+  	max(if(mas.cuenta_institucional=0,mas.email,NULL)) as email1,
+    '' as email2, NULL as p_idpersona, NULL as c_idmatriculacion
+FROM campanias_cuentas_masiva as mas
+WHERE mas.dni IS NOT NULL and mas.suscripcion="si"
+  AND mas.fuente like "%dir%" AND mas.inicial=1
+GROUP BY mas.dni
 
+UNION
+
+-- GRUPO 2
+SELECT mas.dni,
+	mas.nombre, mas.apellido,
+	if(mas.cuenta_institucional=1,mas.email,NULL) as email_gapp,
+  	if(mas.cuenta_institucional=0,mas.email,NULL) as email1,
+    '' as email2, NULL as p_idpersona, NULL as c_idmatriculacion
+FROM campanias_cuentas_masiva as mas
+WHERE mas.dni IS NULL and mas.suscripcion="si" AND
+  mas.fuente like "%dir%" AND mas.inicial=1
 ```
 
 ### Inspectores generales y supervisores de nivel Primario
 
+Similar a la versión de nivel inicial pero ahora filtrando por nivel
+primario `primaria=1`
+
 
 ```sql
 
+-- GRUPO 1
+SELECT mas.dni,
+	mas.nombre, mas.apellido,
+	max(if(mas.cuenta_institucional=1,mas.email,NULL)) as email_gapp,
+  	max(if(mas.cuenta_institucional=0,mas.email,NULL)) as email1,
+    '' as email2, NULL as p_idpersona, NULL as c_idmatriculacion
+FROM campanias_cuentas_masiva as mas
+WHERE mas.dni IS NOT NULL and mas.suscripcion="si"
+  AND mas.fuente like "%sup%" AND mas.primaria=1
+GROUP BY mas.dni
 
+UNION
+
+-- GRUPO 2
+SELECT mas.dni,
+	mas.nombre, mas.apellido,
+	if(mas.cuenta_institucional=1,mas.email,NULL) as email_gapp,
+  	if(mas.cuenta_institucional=0,mas.email,NULL) as email1,
+    '' as email2, NULL as p_idpersona, NULL as c_idmatriculacion
+FROM campanias_cuentas_masiva as mas
+WHERE mas.dni IS NULL and mas.suscripcion="si" AND
+  mas.fuente like "%sup%" AND mas.primaria=1
 ```
 
 ### Directores de escuelas de niveles Primario
 
+Similar a la versión de nivel inicial pero ahora filtrando por nivel
+primario `primaria=1`
 
 ```sql
 
+-- GRUPO 1
+SELECT mas.dni,
+	mas.nombre, mas.apellido,
+	max(if(mas.cuenta_institucional=1,mas.email,NULL)) as email_gapp,
+  	max(if(mas.cuenta_institucional=0,mas.email,NULL)) as email1,
+    '' as email2, NULL as p_idpersona, NULL as c_idmatriculacion
+FROM campanias_cuentas_masiva as mas
+WHERE mas.dni IS NOT NULL and mas.suscripcion="si"
+  AND mas.fuente like "%dir%" AND mas.primaria=1
+GROUP BY mas.dni
 
+UNION
+
+-- GRUPO 2
+SELECT mas.dni,
+	mas.nombre, mas.apellido,
+	if(mas.cuenta_institucional=1,mas.email,NULL) as email_gapp,
+  	if(mas.cuenta_institucional=0,mas.email,NULL) as email1,
+    '' as email2, NULL as p_idpersona, NULL as c_idmatriculacion
+FROM campanias_cuentas_masiva as mas
+WHERE mas.dni IS NULL and mas.suscripcion="si" AND
+  mas.fuente like "%dir%" AND mas.primaria=1
 ```
 
 ### Inspectores generales y supervisores de nivel Secundario
 
+Similar a las versiones anteriores pero ahora filtrando por nivel
+secundario `secundaria=1`
+
 
 ```sql
 
+-- GRUPO 1
+SELECT mas.dni,
+	mas.nombre, mas.apellido,
+	max(if(mas.cuenta_institucional=1,mas.email,NULL)) as email_gapp,
+  	max(if(mas.cuenta_institucional=0,mas.email,NULL)) as email1,
+    '' as email2, NULL as p_idpersona, NULL as c_idmatriculacion
+FROM campanias_cuentas_masiva as mas
+WHERE mas.dni IS NOT NULL and mas.suscripcion="si"
+  AND mas.fuente like "%sup%" AND mas.secundaria=1
+GROUP BY mas.dni
 
+UNION
+
+-- GRUPO 2
+SELECT mas.dni,
+	mas.nombre, mas.apellido,
+	if(mas.cuenta_institucional=1,mas.email,NULL) as email_gapp,
+  	if(mas.cuenta_institucional=0,mas.email,NULL) as email1,
+    '' as email2, NULL as p_idpersona, NULL as c_idmatriculacion
+FROM campanias_cuentas_masiva as mas
+WHERE mas.dni IS NULL and mas.suscripcion="si" AND
+  mas.fuente like "%sup%" AND mas.secundaria=1
 ```
 
 ### Directores de escuelas de niveles Secundario
 
+Similar a las versiones anteriores pero ahora filtrando por nivel
+secundario `secundaria=1`
 
 ```sql
 
+-- GRUPO 1
+SELECT mas.dni,
+	mas.nombre, mas.apellido,
+	max(if(mas.cuenta_institucional=1,mas.email,NULL)) as email_gapp,
+  	max(if(mas.cuenta_institucional=0,mas.email,NULL)) as email1,
+    '' as email2, NULL as p_idpersona, NULL as c_idmatriculacion
+FROM campanias_cuentas_masiva as mas
+WHERE mas.dni IS NOT NULL and mas.suscripcion="si"
+  AND mas.fuente like "%dir%" AND mas.secundaria=1
+GROUP BY mas.dni
 
+UNION
+
+-- GRUPO 2
+SELECT mas.dni,
+	mas.nombre, mas.apellido,
+	if(mas.cuenta_institucional=1,mas.email,NULL) as email_gapp,
+  	if(mas.cuenta_institucional=0,mas.email,NULL) as email1,
+    '' as email2, NULL as p_idpersona, NULL as c_idmatriculacion
+FROM campanias_cuentas_masiva as mas
+WHERE mas.dni IS NULL and mas.suscripcion="si" AND
+  mas.fuente like "%dir%" AND mas.secundaria=1
 ```
 
 ### Inspectores generales y supervisores de nivel Superior
 
+Similar a las versiones anteriores pero ahora filtrando por nivel
+superior `superior=1`
 
 ```sql
 
+-- GRUPO 1
+SELECT mas.dni,
+	mas.nombre, mas.apellido,
+	max(if(mas.cuenta_institucional=1,mas.email,NULL)) as email_gapp,
+  	max(if(mas.cuenta_institucional=0,mas.email,NULL)) as email1,
+    '' as email2, NULL as p_idpersona, NULL as c_idmatriculacion
+FROM campanias_cuentas_masiva as mas
+WHERE mas.dni IS NOT NULL and mas.suscripcion="si"
+  AND mas.fuente like "%sup%" AND mas.superior=1
+GROUP BY mas.dni
 
+UNION
+
+-- GRUPO 2
+SELECT mas.dni,
+	mas.nombre, mas.apellido,
+	if(mas.cuenta_institucional=1,mas.email,NULL) as email_gapp,
+  	if(mas.cuenta_institucional=0,mas.email,NULL) as email1,
+    '' as email2, NULL as p_idpersona, NULL as c_idmatriculacion
+FROM campanias_cuentas_masiva as mas
+WHERE mas.dni IS NULL and mas.suscripcion="si" AND
+  mas.fuente like "%sup%" AND mas.superior=1
 ```
 
 ### IFD públicos de toda la provincia (se pueden segregar por departamento, ciudad y carreras que dictan)
 
+Cabe destacar que para este conjunto de cuentas no se cuenta con los
+mismos atributos que para cuentas asociadas a *"personas"*: `dni`, `nombre`,
+`apellido`, `email_gapp`. El autor va a replicar los campos de la consulta
+general hasta que se defina qué campos van a llevar estos grupos.
 
 ```sql
 
-
+SELECT mas.dni,
+	mas.nombre, mas.apellido,
+	if(mas.cuenta_institucional=1,mas.email,NULL) as email_gapp,
+  	if(mas.cuenta_institucional=0,mas.email,NULL) as email1,
+    '' as email2, NULL as p_idpersona, NULL as c_idmatriculacion
+FROM campanias_cuentas_masiva as mas
+WHERE mas.fuente like "%ifd%" and  mas.ifd_gest_estatal=1;
 ```
 
 ### IFD privados de toda la provincia (se pueden segregar por departamento, ciudad y carreras que dictan)
@@ -378,5 +605,11 @@ del `WHERE` en las siguientes consultas.
 
 ```sql
 
-
+SELECT mas.dni,
+	mas.nombre, mas.apellido,
+	if(mas.cuenta_institucional=1,mas.email,NULL) as email_gapp,
+  	if(mas.cuenta_institucional=0,mas.email,NULL) as email1,
+    '' as email2, NULL as p_idpersona, NULL as c_idmatriculacion
+FROM campanias_cuentas_masiva as mas
+WHERE mas.fuente like "%ifd%" and  mas.ifd_gest_privada=1;
 ```
