@@ -644,6 +644,13 @@ partir de un archivo excel compartido por el área de comunicación.
 En ese sentido, se deben actualizar a demanda y/o sumar según se vayan
 generando nuevas ediciones.
 
+:::{.callout-note}
+Para mantener un registro del origen, estado y otros metadatos sobre estas
+fuentes, se generó la tabla: `grupos_campania`.
+
+![tabla con metadatos sobre las fuentes externas a la BD de autogestión](imgs/grupos_campania.png)
+:::
+
 Finalmente, debido a que las cuentas pueden salir de diversas fuentes y
 por lo tanto podemos tener el dato del DNI, se retoma la idea de combinar
 los dos posibles grupos.
