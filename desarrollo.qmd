@@ -144,7 +144,7 @@ análisis correspondientes.
 Volviendo al caso, la fuente de mails masiva tiene la particularidad de
 que podemos agrupar cuentas por DNI pero, como se indicó anteriormente,
 este atributo no figura en **todas** las fuentes originales. Debido a esto
-se proponen dos grupos que luego serán unificadas.
+se proponen dos grupos que luego serán unificados.
 
 * Con el dato DNI: se agrupan las cuentas en base a este atributo para 
 identificar aquellas que pertenecen a una misma persona. Este grupo
