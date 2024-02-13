@@ -138,7 +138,8 @@ flowchart LR
 
 
 Esto, al momento de "renderizar" la plantilla o cuerpo del mail con los
-datos correspondientes. Pero obviamente esto queda sujeto a debate.
+datos correspondientes. Pero obviamente esto queda sujeto a debate y
+análisis correspondientes.
 
 Volviendo al caso, la fuente de mails masiva tiene la particularidad de
 que podemos agrupar cuentas por DNI pero, como se indicó anteriormente,
@@ -172,9 +173,10 @@ trabajo que lleva su tiempo y esto sólo justifica un esquema en que los
 registros son **personas únicas**.
 
 Para el autor, cada registro en la BD masiva es una **cuenta de correo 
-única** con los atributos que hacen de metadato para conocer un poco más
-sobre el origen de la cuenta. De esta forma, se puede decidir cómo proceder
-en agrupar o generar "bolsas" de cuentas a las cuales enviar campañas.
+única** como dato principal, con los atributos que hacen de metadato 
+para conocer un poco más sobre el origen de la cuenta. De esta forma, 
+se puede decidir cómo proceder en agrupar o generar "bolsas" de cuentas 
+a las cuales enviar campañas.
 
 Es una de las tantas formas de abstraer el problema.
 :::
@@ -235,7 +237,7 @@ el dato de DNI a partir de **formularios**. Por otro lado se puede revisar
 el **tipo de dato** en las tablas de la BD.
 
 
-Se proponen 2 opciones:
+Dado esto último, se proponen 2 opciones:
 
 1. Se deja tal como está: sabemos que la cuenta está bien y el campo DNI no
 es relevante en el envío de campañas, sólo es útil para **agrupar** cuentas

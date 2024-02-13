@@ -282,7 +282,7 @@ Nota
 </div>
 </div>
 </div>
-<p>Esto, al momento de “renderizar” la plantilla o cuerpo del mail con los datos correspondientes. Pero obviamente esto queda sujeto a debate.</p>
+<p>Esto, al momento de “renderizar” la plantilla o cuerpo del mail con los datos correspondientes. Pero obviamente esto queda sujeto a debate y análisis correspondientes.</p>
 <p>Volviendo al caso, la fuente de mails masiva tiene la particularidad de que podemos agrupar cuentas por DNI pero, como se indicó anteriormente, este atributo no figura en <strong>todas</strong> las fuentes originales. Debido a esto se proponen dos grupos que luego serán unificadas.</p>
 <ul>
 <li>Con el dato DNI: se agrupan las cuentas en base a este atributo para identificar aquellas que pertenecen a una misma persona. Este grupo contempla (o contiene) las cuentas de personas que han pasado por el ISEP, es decir, contiene en su mayoría al conjunto de cuentas que estaba siendo utilizado en las campañas masivas hacia finales del 2023. Pero también pueden ser cuentas de personas que no interactuaron con el ISEP y por lo tanto no tienen el dato de cuenta institucional, pero sí el personal.</li>
@@ -300,7 +300,7 @@ Nota
 </div>
 <div class="callout-body-container callout-body">
 <p>El autor considera que no tiene sentido armar una <strong>heurística</strong> avanzada que permita unificar mails en base a otros atríbutos ya que es un trabajo que lleva su tiempo y esto sólo justifica un esquema en que los registros son <strong>personas únicas</strong>.</p>
-<p>Para el autor, cada registro en la BD masiva es una <strong>cuenta de correo única</strong> con los atributos que hacen de metadato para conocer un poco más sobre el origen de la cuenta. De esta forma, se puede decidir cómo proceder en agrupar o generar “bolsas” de cuentas a las cuales enviar campañas.</p>
+<p>Para el autor, cada registro en la BD masiva es una <strong>cuenta de correo única</strong> como dato principal, con los atributos que hacen de metadato para conocer un poco más sobre el origen de la cuenta. De esta forma, se puede decidir cómo proceder en agrupar o generar “bolsas” de cuentas a las cuales enviar campañas.</p>
 <p>Es una de las tantas formas de abstraer el problema.</p>
 </div>
 </div>
@@ -344,7 +344,7 @@ Importante
 </figure>
 </div>
 <p>algunos DNI tienen un formato incorrecto: algunos con pocos dígitos, en otros todos los dígitos son cero, otros empiezan por cero, etc. Esto es consecuencia de la idea <em>GIGO</em> (basura entra, basura sale). Las fuentes de origen tienen el dato de DNI mal formateado, sin verificación, etc. Sin embargo el mail asociado (el personal) es correcto (al menos estructuralmente o en términos de sintaxis). A raíz de esto se recomienda revisar las reglas de verificación en las distintas fuentes que admiten el dato de DNI a partir de <strong>formularios</strong>. Por otro lado se puede revisar el <strong>tipo de dato</strong> en las tablas de la BD.</p>
-<p>Se proponen 2 opciones:</p>
+<p>Dado esto último, se proponen 2 opciones:</p>
 <ol type="1">
 <li>Se deja tal como está: sabemos que la cuenta está bien y el campo DNI no es relevante en el envío de campañas, sólo es útil para <strong>agrupar</strong> cuentas asociadas a una misma persona. Esto se corrige automáticamente, al corregir la fuente de origen (GIGO).</li>
 <li>Se hace un filtro posterior, dejando únicamente los registros con el campo DNI “correcto”. Esto va acorde a la “cultura” del parche constante.</li>
