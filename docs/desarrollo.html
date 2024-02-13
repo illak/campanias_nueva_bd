@@ -128,7 +128,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#grupo-2" id="toc-grupo-2" class="nav-link" data-scroll-target="#grupo-2">Grupo 2</a></li>
   <li><a href="#unificación-de-grupos" id="toc-unificación-de-grupos" class="nav-link" data-scroll-target="#unificación-de-grupos">Unificación de grupos</a></li>
   </ul></li>
-  <li><a href="#grupos-destinatarios-específicos" id="toc-grupos-destinatarios-específicos" class="nav-link" data-scroll-target="#grupos-destinatarios-específicos">Grupos destinatarios específicos</a>
+  <li><a href="#grupos-de-destinatarios-específicos" id="toc-grupos-de-destinatarios-específicos" class="nav-link" data-scroll-target="#grupos-de-destinatarios-específicos">Grupos de destinatarios específicos</a>
   <ul class="collapse">
   <li><a href="#inspectores-generales-y-supervisores-de-nivel-inicial" id="toc-inspectores-generales-y-supervisores-de-nivel-inicial" class="nav-link" data-scroll-target="#inspectores-generales-y-supervisores-de-nivel-inicial">Inspectores generales y supervisores de nivel Inicial</a></li>
   <li><a href="#directores-de-escuelas-de-niveles-inicial" id="toc-directores-de-escuelas-de-niveles-inicial" class="nav-link" data-scroll-target="#directores-de-escuelas-de-niveles-inicial">Directores de escuelas de niveles Inicial</a></li>
@@ -140,8 +140,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#ifd-públicos-de-toda-la-provincia-se-pueden-segregar-por-departamento-ciudad-y-carreras-que-dictan" id="toc-ifd-públicos-de-toda-la-provincia-se-pueden-segregar-por-departamento-ciudad-y-carreras-que-dictan" class="nav-link" data-scroll-target="#ifd-públicos-de-toda-la-provincia-se-pueden-segregar-por-departamento-ciudad-y-carreras-que-dictan">IFD públicos de toda la provincia (se pueden segregar por departamento, ciudad y carreras que dictan)</a></li>
   <li><a href="#ifd-privados-de-toda-la-provincia-se-pueden-segregar-por-departamento-ciudad-y-carreras-que-dictan" id="toc-ifd-privados-de-toda-la-provincia-se-pueden-segregar-por-departamento-ciudad-y-carreras-que-dictan" class="nav-link" data-scroll-target="#ifd-privados-de-toda-la-provincia-se-pueden-segregar-por-departamento-ciudad-y-carreras-que-dictan">IFD privados de toda la provincia (se pueden segregar por departamento, ciudad y carreras que dictan)</a></li>
   <li><a href="#base-de-inglés" id="toc-base-de-inglés" class="nav-link" data-scroll-target="#base-de-inglés">Base de inglés</a></li>
-  </ul></li>
   <li><a href="#base-he-separada-por-niveles" id="toc-base-he-separada-por-niveles" class="nav-link" data-scroll-target="#base-he-separada-por-niveles">Base HE, separada por niveles</a></li>
+  </ul></li>
   </ul>
 </nav>
 </nav>
@@ -395,8 +395,8 @@ Importante
 <span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> mas.dni <span class="kw">IS</span> <span class="kw">NULL</span> <span class="kw">and</span> mas.suscripcion<span class="op">=</span><span class="ot">"si"</span>;</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 </section>
-<section id="grupos-destinatarios-específicos" class="level2">
-<h2 class="anchored" data-anchor-id="grupos-destinatarios-específicos">Grupos destinatarios específicos</h2>
+<section id="grupos-de-destinatarios-específicos" class="level2">
+<h2 class="anchored" data-anchor-id="grupos-de-destinatarios-específicos">Grupos de destinatarios específicos</h2>
 <p>Para todos estos grupos, se aprovechan los distintos atributos de la fuente de mails masiva. Esto se verá reflejado en la parte del <code>WHERE</code> en las siguientes consultas.</p>
 <section id="inspectores-generales-y-supervisores-de-nivel-inicial" class="level3">
 <h3 class="anchored" data-anchor-id="inspectores-generales-y-supervisores-de-nivel-inicial">Inspectores generales y supervisores de nivel Inicial</h3>
@@ -696,15 +696,15 @@ Nota
 <span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> mas.dni <span class="kw">IS</span> <span class="kw">NULL</span> <span class="kw">and</span> mas.suscripcion<span class="op">=</span><span class="ot">"si"</span> <span class="kw">AND</span></span>
 <span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a>    (mas.fuente <span class="kw">like</span> <span class="ot">"%ije%"</span> <span class="kw">OR</span> mas.fuente <span class="kw">like</span> <span class="ot">"%el%"</span> <span class="kw">OR</span> mas.ingles<span class="op">=</span><span class="dv">1</span>);</span></code><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
-</section>
-<section id="base-he-separada-por-niveles" class="level2">
-<h2 class="anchored" data-anchor-id="base-he-separada-por-niveles">Base HE, separada por niveles</h2>
+<section id="base-he-separada-por-niveles" class="level3">
+<h3 class="anchored" data-anchor-id="base-he-separada-por-niveles">Base HE, separada por niveles</h3>
 <blockquote class="blockquote">
 <p>Todos los que se suscribieron de acuerdo al nivel que hayan indicado; todas las personas de la base ISEP de la que podemos rastrear el nivel de desempeño.</p>
 </blockquote>
 <p>Esta fuente aún no fue agregada ya que debemos analizar cómo obtener el listado de personas que se suscribieron en la plataforma.</p>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->

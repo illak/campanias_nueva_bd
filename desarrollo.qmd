@@ -305,7 +305,7 @@ WHERE mas.dni IS NULL and mas.suscripcion="si";
 
 ```
 
-## Grupos destinatarios específicos
+## Grupos de destinatarios específicos
 
 Para todos estos grupos, se aprovechan los distintos atributos de la 
 fuente de mails masiva. Esto se verá reflejado en la parte 
@@ -676,7 +676,7 @@ WHERE mas.dni IS NULL and mas.suscripcion="si" AND
 ```
 
 
-## Base HE, separada por niveles
+### Base HE, separada por niveles
 
 >Todos los que se suscribieron de acuerdo al nivel que hayan indicado; todas las personas de la base ISEP de la que podemos rastrear el nivel de desempeño.
 
