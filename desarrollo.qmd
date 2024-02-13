@@ -229,8 +229,9 @@ Por otro lado, como se puede notar en los primeros registros que devuelve la con
 algunos DNI tienen un formato incorrecto: algunos con pocos
 dígitos, en otros todos los dígitos son cero, otros empiezan por cero, etc.
 Esto es consecuencia de la idea *GIGO* (basura entra, basura sale). Las
-fuentes de origen tienen el dato de DNI mal formateado, sin verificación,
-etc. Sin embargo el mail asociado (el personal) es correcto (al menos
+fuentes de origen tienen el dato de DNI mal formateado producto de no
+realizar una verificación correcta, entre otras cosas. 
+Sin embargo el mail asociado (el personal) es correcto (al menos
 estructuralmente o en términos de sintaxis). A raíz de esto se recomienda
 revisar las reglas de verificación en las distintas fuentes que admiten 
 el dato de DNI a partir de **formularios**. Por otro lado se puede revisar 
@@ -241,9 +242,11 @@ Dado esto último, se proponen 2 opciones:
 
 1. Se deja tal como está: sabemos que la cuenta está bien y el campo DNI no
 es relevante en el envío de campañas, sólo es útil para **agrupar** cuentas
-asociadas a una misma persona. Esto se corrige automáticamente, al corregir
-la fuente de origen (GIGO).
-2. Se hace un filtro posterior, dejando únicamente los registros con el campo DNI "correcto". Esto va acorde a la "cultura" del parche constante.
+asociadas a una misma persona. Las inconsistencias se corrigen 
+automáticamente, al corregir la fuente de origen (GIGO).
+2. Se hace un filtro posterior, dejando únicamente los registros con el
+campo DNI "correcto". Esto va acorde a lo que el autor denomina: "cultura"
+del parche constante.
 
 En este caso se procede con la opción número 1.
 
