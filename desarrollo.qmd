@@ -26,7 +26,16 @@ de mail, etc.
 (con esquema desnormalizado), en donde los mails son un índice único.
 
 
-DIAGRAMAS
+A continuación se muestra un diagrama que muestra a grandes rasgos
+este proceso de ETL:
+
+![Flujo de la tarea de ETL](imgs/diagrama_campanias_ETL.png)
+
+Cada *script* (hecho con python) tiene como objetivo *extraer*, 
+*transformar* y *cargar* datos desde de las fuentes de origen 
+(autogestión, planillas con datos) hacia una tabla *desnormalizada* 
+que pasa a ser la nueva base de datos de todas las cuentas de correo
+existentes.
 
 AUTOMATIZACIÓN CÓMO TAREA FALTANTE
 

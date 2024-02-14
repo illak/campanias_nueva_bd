@@ -185,7 +185,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><strong>Transformación</strong> de los datos que implica la limpieza y procesamiento de los mismos, por ejemplo normalización de atributos, verificación de mail, etc.</li>
 <li><strong>Carga</strong> de los datos transformados y unificados en una tabla (con esquema desnormalizado), en donde los mails son un índice único.</li>
 </ul>
-<p>DIAGRAMAS</p>
+<p>A continuación se muestra un diagrama que muestra a grandes rasgos este proceso de ETL:</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="imgs/diagrama_campanias_ETL.png" class="img-fluid figure-img"></p>
+<figcaption>Flujo de la tarea de ETL</figcaption>
+</figure>
+</div>
+<p>Cada <em>script</em> (hecho con python) tiene como objetivo <em>extraer</em>, <em>transformar</em> y <em>cargar</em> datos desde de las fuentes de origen (autogestión, planillas con datos) hacia una tabla <em>desnormalizada</em> que pasa a ser la nueva base de datos de todas las cuentas de correo existentes.</p>
 <p>AUTOMATIZACIÓN CÓMO TAREA FALTANTE</p>
 </section>
 <section id="conjuntos-de-destinatarios" class="level2">
