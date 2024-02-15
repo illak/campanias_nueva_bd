@@ -120,8 +120,9 @@ siempre va a estar disponible)
 interactuado con alguna propuesta del ISEP)
 * `p_idpersona` (ídem `email_gapp`, este campo actualmente no existe en
 la BD de mails, se puede considerar sumar este atributo, pero... 
-*¿se utiliza?*)
-* `c_idmatriculacion` (al parecer este campo no se utiliza)
+*¿se utiliza en campañas masivas?*)
+* `c_idmatriculacion` (al parecer este campo no se utiliza en 
+campañas masivas)
 
 En base a lo anterior debemos analizar también qué campos se pueden "quitar"
 en la nueva consulta y cuales permanecen. Para esto debemos evaluar si el
